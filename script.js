@@ -6,6 +6,7 @@
 
   const WHATSAPP = "5511939200474";
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const compactMotion = window.matchMedia("(max-width: 600px)").matches;
   const hasGsap = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
 
   /* ---------- WhatsApp: cada botão abre a conversa com uma mensagem pronta ---------- */
@@ -17,8 +18,15 @@
 
   /* ---------- Menu ---------- */
   const nav = document.getElementById("nav");
-  document.getElementById("navToggle").addEventListener("click", () => nav.classList.toggle("open"));
-  document.querySelectorAll("#navLinks a").forEach((a) => a.addEventListener("click", () => nav.classList.remove("open")));
+  const navToggle = document.getElementById("navToggle");
+  const setMenu = (open) => {
+    nav.classList.toggle("open", open);
+    document.documentElement.classList.toggle("menu-open", open);
+    navToggle.setAttribute("aria-expanded", String(open));
+    navToggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+  };
+  navToggle.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+  document.querySelectorAll("#navLinks a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
   const onScrollNav = () => nav.classList.toggle("scrolled", window.scrollY > 40);
   window.addEventListener("scroll", onScrollNav, { passive: true });
   onScrollNav();
@@ -206,6 +214,10 @@
   }
 
   document.fonts.ready.then(() => {
+    if (compactMotion) {
+      ScrollTrigger.refresh();
+      return;
+    }
     document.querySelectorAll("[data-copy]").forEach((el) => {
       const words = splitWords(el);
       gsap.set(words, { yPercent: 110 });
@@ -248,7 +260,7 @@
     gsap.from(bar, { scaleX: 0, transformOrigin: "left", duration: 1.4, ease: "power3.inOut", scrollTrigger: { trigger: bar, start: "top 92%", once: true } });
   });
 
-  /* Revelação em camadas: fixa a seção por 3 alturas de tela */
+  /* Revelação em camadas: uma única cena, sem prender a rolagem */
   (function peel() {
     const section = document.querySelector(".peel");
     const stage = section.querySelector(".peel-stage");
@@ -256,18 +268,14 @@
     const intro = Array.from(section.querySelectorAll(".peel-intro h2"));
     const header = section.querySelector(".peel-header h2");
     const logo = section.querySelector(".l4 .logo");
-    let completed = false;
     const words = splitWords(header);
     header.querySelectorAll(".w").forEach((w) => (w.style.overflow = "visible"));
     gsap.set(words, { opacity: 0 });
     layers.forEach((l, i) => gsap.set(l, { scale: 0.85 - i * 0.18 }));
 
-    ScrollTrigger.create({
-      trigger: section, start: "top top", end: () => "+=" + window.innerHeight * 3,
-      pin: true, pinSpacing: true, scrub: 1, invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        if (self.progress >= 0.999) completed = true;
-        const p = completed ? 1 : self.progress;
+    const state = { progress: 0 };
+    const render = () => {
+        const p = state.progress;
         gsap.set(stage, { scale: p, borderRadius: p < 0.25 ? "3rem" : p > 0.9 ? "0rem" : 3 * (1 - (p - 0.25) / 0.65) + "rem" });
         const lp = Math.min(p / 0.9, 1);
         layers.forEach((l, i) => { const s0 = 0.85 - i * 0.18; gsap.set(l, { scale: s0 + lp * (1 - s0) }); });
@@ -282,7 +290,20 @@
         const hp = p < 0.6 ? 0 : p > 0.9 ? 1 : (p - 0.6) / 0.3;
         const n = words.length;
         words.forEach((w, i) => { const a = i / n, b = (i + 1) / n; gsap.set(w, { opacity: hp >= b ? 1 : hp >= a ? (hp - a) / (b - a) : 0 }); });
-      },
+    };
+    render();
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top 78%",
+      once: true,
+      onEnter: () => gsap.to(state, {
+        progress: 1,
+        duration: 1.6,
+        ease: "power3.inOut",
+        onUpdate: render,
+        onComplete: () => section.classList.add("is-complete"),
+      }),
     });
   })();
 
