@@ -1,0 +1,16 @@
+RA Academia, Unidade Novo Horizonte
+===================================
+Abra o index.html no navegador (dois cliques). Não precisa instalar nada.
+
+- index.html  : estrutura e textos do site
+- style.css   : identidade visual (preto + laranja #FF4200)
+- script.js   : animações e links do WhatsApp
+- assets/     : logo em vetor (SVG)
+
+WhatsApp: o número fica no topo do script.js (const WHATSAPP).
+Cada botão tem sua mensagem pronta no atributo data-wa do index.html.
+
+Os preços dos planos são fictícios: edite na seção "PLANOS" do index.html.
+As animações e fontes vêm da internet (GSAP, Lenis e Google Fonts).
+
+Desenvolvido por Elite Softwares.
