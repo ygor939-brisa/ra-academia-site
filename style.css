@@ -142,9 +142,8 @@ symbol .lo { fill: var(--lo, #ff4200); }
 .class:hover::before { clip-path: inset(0 0 0 0 round var(--radius)); }
 .class, .class * { transition: color .45s, border-color .45s, background-color .45s; }
 .class:hover { color: #0b0b0b; border-color: var(--orange); }
-.class-top { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
-.class-top .num { color: var(--orange); }
-.class:hover .class-top, .class:hover .class-top .num { color: rgba(0,0,0,.65); }
+.class-top { display: flex; justify-content: flex-end; font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.class:hover .class-top { color: rgba(0,0,0,.65); }
 .class h3 { font-size: clamp(46px, 4vw, 66px); margin-top: auto; margin-bottom: 10px; }
 .class .desc { color: var(--ink-2); font-size: 15px; margin-bottom: 22px; min-height: 2.9em; }
 .class:hover .desc { color: rgba(0,0,0,.75); }

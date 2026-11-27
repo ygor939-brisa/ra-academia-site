@@ -156,7 +156,11 @@
         const target = id === "#topo" ? 0 : document.querySelector(id);
         if (target === null) return;
         e.preventDefault();
-        lenis.scrollTo(target, { offset: id === "#topo" ? 0 : -70 });
+        const isHeaderNavigation = Boolean(a.closest("#nav"));
+        lenis.scrollTo(target, {
+          offset: id === "#topo" ? 0 : -70,
+          immediate: isHeaderNavigation,
+        });
       });
     });
   }
@@ -252,6 +256,7 @@
     const intro = Array.from(section.querySelectorAll(".peel-intro h2"));
     const header = section.querySelector(".peel-header h2");
     const logo = section.querySelector(".l4 .logo");
+    let completed = false;
     const words = splitWords(header);
     header.querySelectorAll(".w").forEach((w) => (w.style.overflow = "visible"));
     gsap.set(words, { opacity: 0 });
@@ -261,7 +266,8 @@
       trigger: section, start: "top top", end: () => "+=" + window.innerHeight * 3,
       pin: true, pinSpacing: true, scrub: 1, invalidateOnRefresh: true,
       onUpdate: (self) => {
-        const p = self.progress;
+        if (self.progress >= 0.999) completed = true;
+        const p = completed ? 1 : self.progress;
         gsap.set(stage, { scale: p, borderRadius: p < 0.25 ? "3rem" : p > 0.9 ? "0rem" : 3 * (1 - (p - 0.25) / 0.65) + "rem" });
         const lp = Math.min(p / 0.9, 1);
         layers.forEach((l, i) => { const s0 = 0.85 - i * 0.18; gsap.set(l, { scale: s0 + lp * (1 - s0) }); });
